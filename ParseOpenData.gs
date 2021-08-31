@@ -76,10 +76,15 @@ function parseOpenData() {
     //Проверяем лот всего один или их несколько, потому что от этого зависит имеем мы массив списков или список
     if (lots.length == null) {
       property["bidNumber"] = json["fullNotification"]["notification"]["bidNumber"]["Text"];
+      property["startDate"] = new Date(json["fullNotification"]["notification"]["common"]["startDateRequest"]["Text"]);
+      property["endDate"] = new Date(json["fullNotification"]["notification"]["common"]["expireDate"]["Text"]);
+      property["auctionDate"] = new Date(json["fullNotification"]["notification"]["common"]["openingDate"]["Text"]);
       property["propName"] = lots["propName"]["Text"];
-      property["propId"] = lots["propertyType"]["id"]["Text"];
+      property["torgReason"] = lots["torgReason"]["Text"];
       property["startPrice"] = lots["startPrice"]["Text"];
+      property["depositSize"] = lots["depositSize"]["Text"];
       property["propType"] = lots["propertyType"]["name"]["Text"];
+      property["status"] = lots["bidStatus"]["name"]["Text"];
       try {
         property["address"] = lots["fiasLocation"]["name"]["Text"] + ", " + lots["location"]["Text"];
       }
@@ -93,10 +98,15 @@ function parseOpenData() {
       for (lot in lots) {
         property = {};
         property["bidNumber"] = json["fullNotification"]["notification"]["bidNumber"]["Text"];
+        property["startDate"] = new Date(json["fullNotification"]["notification"]["common"]["startDateRequest"]["Text"]);
+        property["endDate"] = new Date(json["fullNotification"]["notification"]["common"]["expireDate"]["Text"]);
+        property["auctionDate"] = new Date(json["fullNotification"]["notification"]["common"]["openingDate"]["Text"]);
         property["propName"] = lots[lot]["propName"]["Text"];
-        property["propId"] = lots[lot]["propertyType"]["id"]["Text"];
+        property["torgReason"] = lots[lot]["torgReason"]["Text"];
         property["startPrice"] = lots[lot]["startPrice"]["Text"];
+        property["depositSize"] = lots[lot]["depositSize"]["Text"];
         property["propType"] = lots[lot]["propertyType"]["name"]["Text"];
+        property["status"] = lots[lot]["bidStatus"]["name"]["Text"];
         try {
           property["address"] = lots[lot]["fiasLocation"]["name"]["Text"] + ", " + lots[lot]["location"]["Text"];
         }
@@ -159,13 +169,23 @@ function parseOpenData() {
       col = 1;
       sheet.getRange(row, col).setValue(propArray[notice][lot]["bidNumber"]);
       col += 1;
-      sheet.getRange(row, col).setValue(propArray[notice][lot]["propId"]);
-      col += 1;
       sheet.getRange(row, col).setValue(propArray[notice][lot]["propType"]);
       col += 1;
       sheet.getRange(row, col).setValue(propArray[notice][lot]["propName"]);
       col += 1;
+      sheet.getRange(row, col).setValue(propArray[notice][lot]["torgReason"]);
+      col += 1;
+      sheet.getRange(row, col).setValue(propArray[notice][lot]["status"]);
+      col += 1;
       sheet.getRange(row, col).setValue(propArray[notice][lot]["startPrice"]);
+      col += 1;
+      sheet.getRange(row, col).setValue(propArray[notice][lot]["depositSize"]);
+      col += 1;
+      sheet.getRange(row, col).setValue(propArray[notice][lot]["startDate"]);
+      col += 1;
+      sheet.getRange(row, col).setValue(propArray[notice][lot]["endDate"]);
+      col += 1;
+      sheet.getRange(row, col).setValue(propArray[notice][lot]["auctionDate"]);
       col += 1;
       sheet.getRange(row, col).setValue(propArray[notice][lot]["notificationUrl"]);
       col += 1;
@@ -212,7 +232,11 @@ function parseOpenData() {
   } 
 
   //Начальную стоимость лота мы получаем в виде числа с точкой, поэтому заменяем точку на запятую, чтобы google sheet распознал ее как число.
-  var range = sheet.getRange("E7:E");
+  var range = sheet.getRange("F7:F");
+  range.setValues(range.getValues().map(function(row) {
+    return [row[0].toString().replace(".", ",")];
+  }));
+  range = sheet.getRange("G7:G");
   range.setValues(range.getValues().map(function(row) {
     return [row[0].toString().replace(".", ",")];
   }));
